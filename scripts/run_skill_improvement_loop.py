@@ -125,18 +125,32 @@ def git_safe_check(project_root: Path) -> bool:
             logger.error("Not on main branch (on '%s'). Aborting.", branch.stdout.strip())
             return False
 
-        pull = subprocess.run(
-            ["git", "pull", "--ff-only"],
+        # Check if local is ahead of origin (can't fast-forward in that case)
+        ahead_check = subprocess.run(
+            ["git", "rev-list", "--count", "origin/main..HEAD"],
             cwd=project_root,
             capture_output=True,
             text=True,
             check=False,
         )
-        if pull.returncode != 0:
-            logger.warning(
-                "git pull --ff-only failed; will retry next run. stderr: %s", pull.stderr.strip()
+        ahead_count = int(ahead_check.stdout.strip()) if ahead_check.returncode == 0 else 0
+        if ahead_count > 0:
+            logger.info(
+                "Local branch is %d commit(s) ahead of origin; skipping pull.", ahead_count
             )
-            return False
+        else:
+            pull = subprocess.run(
+                ["git", "pull", "--ff-only"],
+                cwd=project_root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if pull.returncode != 0:
+                logger.warning(
+                    "git pull --ff-only failed; will retry next run. stderr: %s", pull.stderr.strip()
+                )
+                return False
 
     except FileNotFoundError:
         logger.error("git not found.")
