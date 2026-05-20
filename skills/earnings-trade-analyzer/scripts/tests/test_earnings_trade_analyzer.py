@@ -1051,3 +1051,73 @@ class TestEntryFilter:
         ]
         filtered = apply_entry_filter(results)
         assert len(filtered) == 2
+
+
+# ===========================================================================
+# Entry Filter — all_results overwrite regression (Finding #1)
+# ===========================================================================
+
+
+class TestEntryFilterMetadata:
+    """Verify that all_results passed to report generators reflects the
+    pre-filter universe, not the post-filter subset.
+
+    Regression test for the bug where line 352 of analyze_earnings_trades.py
+    reassigned all_results = results[:] *after* filtering, causing
+    total_screened in reports to reflect only filtered count.
+    """
+
+    def _make_result(self, symbol: str, price=50.0, gap_pct=5.0, score=75.0):
+        return {
+            "symbol": symbol,
+            "earnings_date": "2025-01-10",
+            "current_price": price,
+            "gap_pct": gap_pct,
+            "gap_type": "up",
+            "composite_score": score,
+            "grade": "B",
+            "scores": {},
+        }
+
+    def test_json_report_total_reflects_pre_filter_count(self, tmp_path):
+        """generate_json_report with all_results=original 5 reports total=5."""
+        original = [
+            self._make_result("AAA", price=100.0, score=80.0),
+            self._make_result("BBB", price=100.0, score=80.0),
+            self._make_result("CCC", price=100.0, score=80.0),
+            self._make_result("DDD", price=8.0, score=70.0),   # would be filtered (price < $30)
+            self._make_result("EEE", price=15.0, score=65.0),  # would be filtered (price < $30)
+        ]
+        filtered = [r for r in original if r["current_price"] >= 30.0]
+        assert len(filtered) == 3
+
+        metadata = {"run_date": "2025-01-10", "lookback_days": 5}
+        output_file = str(tmp_path / "report.json")
+        generate_json_report(filtered, metadata, output_file, all_results=original)
+
+        with open(output_file) as f:
+            data = json.load(f)
+
+        assert data["summary"]["total"] == 5, (
+            "summary.total should reflect the pre-filter universe (5), not the filtered set (3)"
+        )
+
+    def test_markdown_report_total_reflects_pre_filter_count(self, tmp_path):
+        """generate_markdown_report with all_results=original 5 shows 'Total Screened: 5'."""
+        original = [
+            self._make_result("AAA", price=100.0, score=80.0),
+            self._make_result("BBB", price=100.0, score=80.0),
+            self._make_result("CCC", price=100.0, score=80.0),
+            self._make_result("DDD", price=8.0, score=70.0),
+            self._make_result("EEE", price=15.0, score=65.0),
+        ]
+        filtered = [r for r in original if r["current_price"] >= 30.0]
+
+        metadata = {"run_date": "2025-01-10", "lookback_days": 5}
+        output_file = str(tmp_path / "report.md")
+        generate_markdown_report(filtered, metadata, output_file, all_results=original)
+
+        content = open(output_file).read()
+        assert "5" in content, (
+            "Markdown report should mention 5 (pre-filter total) somewhere in the summary"
+        )

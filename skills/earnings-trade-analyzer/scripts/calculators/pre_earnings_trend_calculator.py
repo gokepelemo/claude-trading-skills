@@ -5,6 +5,13 @@ Pre-Earnings Trend Calculator for Earnings Trade Analyzer
 Calculates the 20-day price return before the earnings date to assess
 the stock's momentum heading into the earnings report.
 
+Endpoint selection:
+  - BMO (before market open): close on the day *before* earnings
+    (daily_prices[earnings_idx+1]) so the intraday gap on earnings day
+    is excluded from the trend measurement.
+  - AMC / unknown: close on earnings day (daily_prices[earnings_idx]),
+    which is before the next-day gap opens.
+
 Scoring (30% weight):
   return >= 15%: 100
   return >= 10%:  85
@@ -50,13 +57,19 @@ def _score_trend(return_pct: float) -> float:
         return 15.0
 
 
-def calculate_pre_earnings_trend(daily_prices: list[dict], earnings_date: str) -> dict:
+def calculate_pre_earnings_trend(daily_prices: list[dict], earnings_date: str, timing: str = "amc") -> dict:
     """
     Calculate 20-day return before earnings date.
+
+    For BMO stocks, the trend endpoint is the close on the day *before* the
+    earnings date (earnings_idx+1 in most-recent-first order) so the gap on
+    earnings day is not included in the trend score.  For AMC/unknown the
+    endpoint is the close on earnings day itself (before the next-day gap).
 
     Args:
         daily_prices: list of dicts with 'date', 'close' (most-recent-first)
         earnings_date: YYYY-MM-DD string
+        timing: 'bmo', 'amc', or 'unknown' (default 'amc')
 
     Returns:
         dict with:
@@ -75,9 +88,25 @@ def calculate_pre_earnings_trend(daily_prices: list[dict], earnings_date: str) -
             "warning": f"Earnings date {earnings_date} not found in price data",
         }
 
-    # 20 trading days before earnings date
-    # In most-recent-first, 20 days before is at earnings_idx + 20
-    lookback_idx = earnings_idx + 20
+    # Select the trend endpoint depending on timing.
+    # BMO: use close[earnings_idx+1] (previous day) to exclude the gap itself.
+    # AMC/unknown: use close[earnings_idx] (earnings-day close, gap is next open).
+    if timing == "bmo":
+        endpoint_idx = earnings_idx + 1
+    else:
+        endpoint_idx = earnings_idx
+
+    if endpoint_idx >= len(daily_prices):
+        return {
+            "return_20d_pct": 0.0,
+            "trend_direction": "up",
+            "score": 0.0,
+            "warning": "Insufficient data: no day before earnings for BMO endpoint",
+        }
+
+    # 20 trading days before the endpoint.
+    # In most-recent-first order, 20 days further back = endpoint_idx + 20.
+    lookback_idx = endpoint_idx + 20
 
     if lookback_idx >= len(daily_prices):
         return {
@@ -87,7 +116,7 @@ def calculate_pre_earnings_trend(daily_prices: list[dict], earnings_date: str) -
             "warning": "Insufficient data for 20-day pre-earnings trend calculation",
         }
 
-    close_at_earnings = daily_prices[earnings_idx]["close"]
+    close_at_endpoint = daily_prices[endpoint_idx]["close"]
     close_20d_before = daily_prices[lookback_idx]["close"]
 
     if close_20d_before == 0:
@@ -98,7 +127,7 @@ def calculate_pre_earnings_trend(daily_prices: list[dict], earnings_date: str) -
             "warning": "Price 20 days before earnings is zero",
         }
 
-    return_20d_pct = ((close_at_earnings / close_20d_before) - 1.0) * 100.0
+    return_20d_pct = ((close_at_endpoint / close_20d_before) - 1.0) * 100.0
     trend_direction = "up" if return_20d_pct >= 0 else "down"
     score = _score_trend(return_20d_pct)
 

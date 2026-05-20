@@ -67,10 +67,10 @@ def analyze_stock(daily_prices, earnings_date, timing):
         dict with component results and composite score
     """
     gap_result = calculate_gap(daily_prices, earnings_date, timing)
-    trend_result = calculate_pre_earnings_trend(daily_prices, earnings_date)
+    trend_result = calculate_pre_earnings_trend(daily_prices, earnings_date, timing)
     volume_result = calculate_volume_trend(daily_prices, earnings_date)
-    ma200_result = calculate_ma200_position(daily_prices)
-    ma50_result = calculate_ma50_position(daily_prices)
+    ma200_result = calculate_ma200_position(daily_prices, earnings_date)
+    ma50_result = calculate_ma50_position(daily_prices, earnings_date)
 
     composite = calculate_composite_score(
         gap_score=gap_result["score"],
@@ -344,12 +344,13 @@ def main():
 
     print(f"\nScored {len(results)} stocks.", file=sys.stderr)
 
-    # Apply entry quality filter if requested
+    # Apply entry quality filter if requested.
+    # Snapshot the full pre-filter list first so report metadata reflects
+    # the true screened universe, not just the filtered subset.
     all_results = results[:]
     if args.apply_entry_filter:
         results = apply_entry_filter(results)
         print(f"After entry filter: {len(results)} stocks.", file=sys.stderr)
-        all_results = results[:]
 
     # Sort by composite score descending
     results.sort(key=lambda x: x.get("composite_score", 0), reverse=True)

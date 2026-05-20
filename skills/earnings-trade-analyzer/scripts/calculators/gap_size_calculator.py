@@ -149,4 +149,16 @@ def calculate_gap(daily_prices: list[dict], earnings_date: str, timing: str) -> 
         "timing_used": timing_lower,
         "score": score,
     }
+
+    # Gap score uses absolute value (by design) so a -15% gap scores the same
+    # as +15%. For PEAD setups, gap-downs do not produce the same accumulation
+    # dynamic as gap-ups. Flag this visibly so operators know when a high gap
+    # score is actually a gap-down.
+    if gap_type == "down":
+        result["gap_down_warning"] = (
+            f"Gap is DOWN ({gap_pct:.1f}%). Gap score ({score:.0f}) uses absolute "
+            "value and does not penalise direction. A gap-down setup does not "
+            "support the PEAD accumulation thesis — review with caution."
+        )
+
     return result

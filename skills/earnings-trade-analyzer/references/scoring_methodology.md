@@ -24,9 +24,17 @@ Measures the magnitude of the earnings gap, regardless of direction. Larger gaps
 - **AMC (After Market Close):** gap = open[next_day] / close[earnings_date] - 1
 - **Unknown:** Uses AMC logic as default
 
+**Design note — gap direction:** The score uses absolute gap magnitude so a -15% gap-down scores identically to a +15% gap-up. This is intentional for general volatility detection, but has an important implication for PEAD (Post-Earnings Announcement Drift) strategies: **gap-downs do not produce the same accumulation dynamic as gap-ups**. Buyers chasing a downside gap are fighting the initial reaction. When the calculator returns `gap_type = "down"`, a `gap_down_warning` field is added to the result. Operators should treat any Grade A or B rating where `gap_type = "down"` with extra skepticism — the high gap score is measuring a downside event, not an upside breakout.
+
 ### Factor 2: Pre-Earnings Trend (30% Weight)
 
-Measures the 20-day price return leading into earnings. Stocks trending up before a positive earnings gap show stronger momentum characteristics.
+Measures the 20-day price return in the 20 trading days **before** the earnings date. Stocks trending up before a positive earnings gap show stronger momentum characteristics.
+
+**Window definition (most-recent-first arrays):**
+- `close_at_endpoint`: For BMO stocks, `daily_prices[earnings_idx + 1]` (close of the day *before* earnings) to avoid including the gap itself in the trend score. For AMC/unknown, `daily_prices[earnings_idx]` (close on earnings day, before next-day gap).
+- `close_20d_before`: `daily_prices[earnings_idx + 21]` (20 trading days before the endpoint).
+
+This ensures the trend score measures pre-earnings accumulation, not the gap reaction itself.
 
 | 20-Day Return | Score |
 |--------------|-------|
@@ -39,7 +47,13 @@ Measures the 20-day price return leading into earnings. Stocks trending up befor
 
 ### Factor 3: Volume Trend (20% Weight)
 
-Ratio of 20-day average volume to 60-day average volume around the earnings date. Higher ratios indicate increased institutional interest and accumulation.
+Ratio of 20-day average volume to 60-day average volume, both measured **before** the earnings date. Higher ratios indicate increased institutional interest and accumulation leading into the event.
+
+**Window definition (most-recent-first arrays):**
+- 20-day window: `daily_prices[earnings_idx+1 : earnings_idx+21]` (20 trading days immediately before earnings)
+- 60-day baseline: `daily_prices[earnings_idx+1 : earnings_idx+61]` (60 trading days before earnings)
+
+Measuring pre-earnings volume rather than post-earnings volume matters: a post-earnings volume spike is an expected reaction to any event. Pre-earnings accumulation reflects *conviction leading in*, which is the signal this factor targets.
 
 | Volume Ratio (20d/60d) | Score |
 |------------------------|-------|
@@ -51,7 +65,9 @@ Ratio of 20-day average volume to 60-day average volume around the earnings date
 
 ### Factor 4: MA200 Position (15% Weight)
 
-Current price position relative to the 200-day Simple Moving Average. Stocks above their 200-day SMA are in long-term uptrends.
+Price position relative to the 200-day Simple Moving Average, **anchored to the earnings date**. The SMA is computed from the 200 closes ending at `earnings_idx` so the score reflects the stock's trend structure at the time of the event, not at the time the script is run.
+
+**Staleness warning:** If the script is run more than 5 trading days after earnings, a `staleness_warning` field is added to the result indicating that the SMA was computed as-of the earnings date and may differ from current MA200.
 
 | Distance from MA200 | Score |
 |---------------------|-------|
@@ -64,7 +80,9 @@ Current price position relative to the 200-day Simple Moving Average. Stocks abo
 
 ### Factor 5: MA50 Position (10% Weight)
 
-Current price position relative to the 50-day Simple Moving Average. Stocks above their 50-day SMA show medium-term strength.
+Price position relative to the 50-day Simple Moving Average, anchored to the earnings date (same rationale as MA200). Stocks above their 50-day SMA show medium-term strength.
+
+**Staleness warning:** Same staleness flag as MA200 when run >5 days post-earnings.
 
 | Distance from MA50 | Score |
 |--------------------|-------|
@@ -87,6 +105,8 @@ Current price position relative to the 50-day Simple Moving Average. Stocks abov
 
 When `--apply-entry-filter` is enabled, the following stocks are excluded:
 - Stocks with current price < $10 (penny stock territory, lower institutional interest)
+
+**Note on the 517-trade backtest:** The entry filter rules were derived from a backtest over 517 historical earnings trades. The backtest script (`entry_filter.py`) and results summary are not currently included in this skill directory. If you need to audit or reproduce the filter logic, reach out to the skill maintainer or check the trading journal for the original session where the rules were derived.
 
 ## Historical Win Rate Context
 

@@ -3,9 +3,15 @@
 Volume Trend Calculator for Earnings Trade Analyzer
 
 Calculates the volume ratio around the earnings date:
-  ratio = 20-day average volume / 60-day average volume
+  ratio = 20-day average volume (pre-earnings) / 60-day average volume (pre-earnings)
 
-A ratio > 1.0 indicates increased institutional interest around earnings.
+Both windows are measured in the 20 / 60 trading days *before* the earnings date.
+In most-recent-first price arrays, "before earnings" means higher indices.
+  20-day window: daily_prices[earnings_idx+1 : earnings_idx+21]
+  60-day window: daily_prices[earnings_idx+1 : earnings_idx+61]
+
+A ratio > 1.0 indicates increased institutional accumulation *leading into* earnings,
+which is the signal of interest for PEAD setups.
 
 Scoring (20% weight):
   ratio >= 2.0: 100
@@ -76,12 +82,12 @@ def calculate_volume_trend(daily_prices: list[dict], earnings_date: str) -> dict
             "warning": f"Earnings date {earnings_date} not found in price data",
         }
 
-    # Calculate 20-day average volume starting from earnings date
-    # In most-recent-first order, the 20 days around/after earnings
-    # are at indices max(0, earnings_idx - 10) to earnings_idx + 10
-    # But simpler: use earnings_idx as center, take 20 days from earnings_idx forward
-    start_20 = earnings_idx
-    end_20 = min(earnings_idx + 20, len(daily_prices))
+    # Calculate 20-day average volume in the 20 trading days *before* earnings.
+    # In most-recent-first order, higher indices = older dates.
+    # earnings_idx is the earnings bar itself; earnings_idx+1 is the day before.
+    # Window: indices [earnings_idx+1, earnings_idx+21) = 20 pre-earnings trading days.
+    start_20 = earnings_idx + 1
+    end_20 = min(earnings_idx + 21, len(daily_prices))
 
     if end_20 - start_20 < 5:
         return {
@@ -95,9 +101,10 @@ def calculate_volume_trend(daily_prices: list[dict], earnings_date: str) -> dict
     volumes_20 = [daily_prices[i]["volume"] for i in range(start_20, end_20)]
     recent_avg = sum(volumes_20) / len(volumes_20)
 
-    # Calculate 60-day average volume
-    start_60 = earnings_idx
-    end_60 = min(earnings_idx + 60, len(daily_prices))
+    # Calculate 60-day baseline volume from the 60 trading days *before* earnings.
+    # Window: indices [earnings_idx+1, earnings_idx+61) = 60 pre-earnings trading days.
+    start_60 = earnings_idx + 1
+    end_60 = min(earnings_idx + 61, len(daily_prices))
 
     if end_60 - start_60 < 20:
         return {

@@ -141,53 +141,64 @@ class FMPClient:
     def _rate_limited_get(
         self, url: str, params: Optional[dict] = None, quiet: bool = False
     ) -> Optional[dict]:
-        """Execute a rate-limited GET request with budget enforcement."""
+        """Execute a rate-limited GET request with budget enforcement.
+
+        Retries once on HTTP 429 (rate-limit) after sleeping 60 seconds.
+        api_calls_made is incremented only on actual HTTP responses (2xx or
+        terminal errors) — the 429 retry does not consume an extra budget slot.
+        The budget check runs before each attempt; if a 429 retry would push
+        the budget over the limit the retry is skipped and None is returned.
+        """
         if self.rate_limit_reached:
             return None
-
-        if self.api_calls_made >= self.max_api_calls:
-            raise ApiCallBudgetExceeded(
-                f"API call budget exceeded: {self.api_calls_made}/{self.max_api_calls} calls used."
-            )
 
         if params is None:
             params = {}
 
-        elapsed = time.time() - self.last_call_time
-        if elapsed < self.RATE_LIMIT_DELAY:
-            time.sleep(self.RATE_LIMIT_DELAY - elapsed)
+        for attempt in range(self.max_retries + 1):
+            if self.api_calls_made >= self.max_api_calls:
+                raise ApiCallBudgetExceeded(
+                    f"API call budget exceeded: {self.api_calls_made}/{self.max_api_calls} calls used."
+                )
 
-        try:
-            response = self.session.get(url, params=params, timeout=30)
-            self.last_call_time = time.time()
-            self.api_calls_made += 1
+            elapsed = time.time() - self.last_call_time
+            if elapsed < self.RATE_LIMIT_DELAY:
+                time.sleep(self.RATE_LIMIT_DELAY - elapsed)
 
-            if response.status_code == 200:
-                self.retry_count = 0
-                return response.json()
-            elif response.status_code == 429:
-                self.retry_count += 1
-                if self.retry_count <= self.max_retries:
-                    print("WARNING: Rate limit exceeded. Waiting 60 seconds...", file=sys.stderr)
-                    time.sleep(60)
-                    return self._rate_limited_get(url, params, quiet=quiet)
+            try:
+                response = self.session.get(url, params=params, timeout=30)
+                self.last_call_time = time.time()
+
+                if response.status_code == 200:
+                    self.api_calls_made += 1
+                    self.retry_count = 0
+                    return response.json()
+                elif response.status_code == 429:
+                    if attempt < self.max_retries:
+                        print("WARNING: Rate limit exceeded. Waiting 60 seconds...", file=sys.stderr)
+                        time.sleep(60)
+                        continue  # retry without incrementing api_calls_made
+                    else:
+                        self.api_calls_made += 1  # count the terminal 429
+                        print("ERROR: Daily API rate limit reached.", file=sys.stderr)
+                        self.rate_limit_reached = True
+                        return None
                 else:
-                    print("ERROR: Daily API rate limit reached.", file=sys.stderr)
-                    self.rate_limit_reached = True
+                    self.api_calls_made += 1
+                    if not quiet:
+                        print(
+                            f"ERROR: API request failed: {response.status_code} - {response.text[:200]}",
+                            file=sys.stderr,
+                        )
                     return None
-            else:
-                if not quiet:
-                    print(
-                        f"ERROR: API request failed: {response.status_code} - {response.text[:200]}",
-                        file=sys.stderr,
-                    )
+            except requests.exceptions.Timeout:
+                print(f"WARNING: Request timed out for {url}", file=sys.stderr)
                 return None
-        except requests.exceptions.Timeout:
-            print(f"WARNING: Request timed out for {url}", file=sys.stderr)
-            return None
-        except requests.exceptions.RequestException as e:
-            print(f"ERROR: Request exception: {e}", file=sys.stderr)
-            return None
+            except requests.exceptions.RequestException as e:
+                print(f"ERROR: Request exception: {e}", file=sys.stderr)
+                return None
+
+        return None  # exhausted retries
 
     def _request_with_fallback(self, endpoint_key, symbols_str, extra_params=None):
         """Try stable endpoint first, fall back to v3 for legacy users.
