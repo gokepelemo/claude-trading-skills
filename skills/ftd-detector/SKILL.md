@@ -133,17 +133,17 @@ NO_SIGNAL → CORRECTION → RALLY_ATTEMPT → FTD_WINDOW → FTD_CONFIRMED
 
 ## Reference Documents
 
-### `skills/ftd-detector/references/ftd_methodology.md`
+### `references/ftd_methodology.md`
 - O'Neil's FTD rules in detail
 - Rally attempt mechanics and day counting
 - Historical FTD examples (2020 March, 2022 October)
 
-### `skills/ftd-detector/references/post_ftd_guide.md`
+### `references/post_ftd_guide.md`
 - Post-FTD distribution day failure rates
 - Power Trend definition and conditions
 - Success vs failure pattern comparison
 
 ### When to Load References
-- **First use:** Load `skills/ftd-detector/references/ftd_methodology.md` for full understanding
-- **Post-FTD questions:** Load `skills/ftd-detector/references/post_ftd_guide.md`
+- **First use:** Load `references/ftd_methodology.md` for full understanding
+- **Post-FTD questions:** Load `references/post_ftd_guide.md`
 - **Regular execution:** References not needed - script handles analysis
