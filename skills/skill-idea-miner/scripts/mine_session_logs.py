@@ -23,6 +23,7 @@ PROJECT_ALLOWLIST = [
     "trade-edge-finder",
     "trade-strategy-pipeline",
     "weekly-trade-strategy",
+    "hermes-trading-skills",
 ]
 
 CLAUDE_TIMEOUT = 600
