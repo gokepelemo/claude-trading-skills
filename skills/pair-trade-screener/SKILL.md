@@ -22,6 +22,18 @@ This skill identifies and analyzes statistical arbitrage opportunities through p
 - Statistical foundation: Data-driven, not discretionary
 - Diversification: Uncorrelated to traditional long-only strategies
 
+## Prerequisites
+
+- **FMP API key (required):** Historical price data is fetched from Financial Modeling Prep. The free tier (~250 requests/day) is sufficient for basic screening.
+- **Python 3.8+** with the following packages:
+  ```bash
+  pip install pandas numpy scipy statsmodels requests
+  ```
+- **Set the API key** before running any script (or pass `--api-key YOUR_KEY`):
+  ```bash
+  export FMP_API_KEY=your_key_here
+  ```
+
 ## When to Use This Skill
 
 Use this skill when:
@@ -474,6 +486,16 @@ python scripts/analyze_spread.py \
 - Entry/exit recommendations
 - Position sizing
 - Historical z-score chart (text)
+
+## Output
+
+Analysis outputs are written to the `reports/` directory (create it if it does not exist).
+
+**Report files:**
+- **Markdown report** — `pair_trade_analysis_[SECTOR]_[YYYY-MM-DD].md` (e.g. `pair_trade_analysis_Technology_2025-11-08.md`). Contains the executive summary, cointegrated pairs table, detailed top-pair analysis, text-based spread charts, and risk warnings (see Step 8).
+- **JSON results** — emitted by `scripts/find_pairs.py` via `--output` (default: stdout). One object per candidate pair with `pair`, `correlation`, `beta`, `cointegration_pvalue`, `adf_statistic`, `half_life_days`, `current_zscore`, `signal`, and `strength` fields.
+
+`scripts/analyze_spread.py` prints a single-pair report to stdout: current spread analysis, z-score, entry/exit recommendation, position sizing, and a text-based historical z-score chart.
 
 ## Reference Documentation
 
