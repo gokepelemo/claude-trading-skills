@@ -28,6 +28,27 @@ Three phases:
   every 1–5 min via `watch` or cron; replay-deterministic so re-runs
   are byte-identical.
 
+## Prerequisites
+
+- **FMP API key (required, Phase 1).** Set it once in the shell before
+  running the screener:
+  ```bash
+  export FMP_API_KEY=your_key_here
+  ```
+  Or pass `--api-key YOUR_KEY` on the `screen_parabolic.py` command line.
+  Sign up at https://site.financialmodelingprep.com/developer/docs (free
+  tier: 250 calls/day, sufficient for daily screening).
+- **Alpaca API keys (optional, Phase 2; required for Phase 3 live bars).**
+  ```bash
+  export ALPACA_API_KEY=your_api_key_id
+  export ALPACA_SECRET_KEY=your_secret_key
+  ```
+  Without them Phase 2 falls back to `ManualBrokerAdapter` (every
+  candidate marked `watch_only`), and Phase 3 must run against a fixture
+  (`--bars-source fixture`). `data.alpaca.markets` serves both paper and
+  live accounts. Sign up at https://alpaca.markets/.
+- **Python 3** with the repository dependencies installed.
+
 ## When to Use
 
 Invoke this skill when the user wants to:
