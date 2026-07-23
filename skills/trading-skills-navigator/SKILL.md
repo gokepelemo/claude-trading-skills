@@ -34,6 +34,18 @@ consumes the repo metadata; this SKILL.md narrates the result conversationally.
 Do **not** use this skill to execute trades, place orders, or auto-run other
 skills. It recommends and explains only.
 
+## Prerequisites
+
+- **Python 3** — to run `scripts/recommend.py` (standard library only; no
+  third-party packages required).
+- **No API keys required** — the recommender routes and explains only. It reads
+  local metadata and never makes network calls.
+- **Metadata source** — in **Claude Code**, run from the repo root so the
+  script reads the SSoT (`skills-index.yaml` + `workflows/*.yaml`). In the
+  **Claude Web App**, no setup is needed: the script falls back to the bundled
+  `assets/metadata_snapshot.json` automatically. (If the snapshot drifts from
+  the SSoT, run `scripts/build_snapshot.py` to regenerate it.)
+
 ## Workflow
 
 ### Step 1 — Capture the goal and constraints
