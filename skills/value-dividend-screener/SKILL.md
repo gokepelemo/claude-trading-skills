@@ -26,6 +26,18 @@ Invoke this skill when the user requests:
 - "Screen for sustainable high-yield stocks"
 - Any request combining dividend yield, valuation metrics, and fundamental analysis
 
+## Prerequisites
+
+- **FMP API key (required):** Set `FMP_API_KEY` or pass `--fmp-api-key`. Free tier (250 calls/day) is sufficient for two-stage screening. See `references/fmp_api_guide.md`.
+- **FINVIZ Elite API key (optional, recommended):** Set `FINVIZ_API_KEY` or pass `--finviz-api-key` and add `--use-finviz`. Requires a FINVIZ Elite subscription (~$40/month or ~$330/year). Pre-screening reduces FMP API calls by ~90% and runtime from 5-15 min to 2-3 min.
+- **Python dependency:** `requests` (`pip install requests`).
+- **Network access** to `financialmodelingprep.com` and (if using FINVIZ) `elite.finviz.com`.
+
+```bash
+export FMP_API_KEY=your_fmp_key_here
+export FINVIZ_API_KEY=your_finviz_key_here   # optional, only for --use-finviz
+```
+
 ## Workflow
 
 ### Step 1: Verify API Key Availability
@@ -305,6 +317,26 @@ Anticipate common user questions:
 - Diversification guidance: minimum 10-15 for dividend portfolio
 - Sector balance considerations
 - Position sizing based on risk tolerance
+
+## Output
+
+The script writes a single JSON file (default: `logs/dividend_screener_results.json`; override with `--output`). Structure:
+
+```json
+{
+  "metadata": {
+    "generated_at": "<ISO-8601 UTC timestamp>",
+    "criteria": { "dividend_yield_min": 3.0, "pe_ratio_max": 20, "pb_ratio_max": 2, "dividend_cagr_min": 4.0, ... },
+    "scoring": { "dividend_growth": "max 15 points (10%+ CAGR)", ... },
+    "total_results": 20
+  },
+  "stocks": [ { "symbol": "...", "composite_score": 0.0, ... }, ... ]
+}
+```
+
+**Per-stock fields:** `symbol`, `company_name`, `sector`, `market_cap`, `price`, `dividend_yield`, `annual_dividend`, `pe_ratio`, `pb_ratio`, `rsi`, `dividend_cagr_3y`, `dividend_consistent`, `dividend_stable`, `dividend_growing`, `dividend_volatility_pct`, `dividend_years_of_growth`, `revenue_cagr_3y`, `revenue_uptrend`, `eps_cagr_3y`, `earnings_uptrend`, `payout_ratio`, `fcf_payout_ratio`, `dividend_sustainable`, `debt_to_equity`, `current_ratio`, `financially_healthy`, `roe`, `profit_margin`, `quality_score`, `stability_score`, `composite_score`.
+
+Stocks are ranked by `composite_score` (0-100). When oversold candidates exist (RSI ≤ 40) they are returned first; otherwise the lowest-RSI stocks are returned. Progress and errors are written to stderr; only the JSON goes to the output file. Convert this JSON into the markdown report described in **Step 4** for the user.
 
 ## Resources
 
