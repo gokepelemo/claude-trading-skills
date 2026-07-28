@@ -16,7 +16,12 @@ Screen S&P 500 stocks for Mark Minervini's Volatility Contraction Pattern (VCP),
 
 ## Prerequisites
 
-- FMP API key (set `FMP_API_KEY` environment variable or pass `--api-key`)
+- FMP API key (set `FMP_API_KEY` environment variable or pass `--api-key`):
+
+  ```bash
+  export FMP_API_KEY=your_key_here
+  ```
+
 - Free tier (250 calls/day) is sufficient for default screening (top 100 candidates)
 - Paid tier recommended for full S&P 500 screening (`--full-sp500`)
 
@@ -28,13 +33,13 @@ Run the VCP screener script:
 
 ```bash
 # Default: S&P 500, top 100 candidates
-python3 skills/vcp-screener/scripts/screen_vcp.py --output-dir skills/vcp-screener/scripts
+python3 skills/vcp-screener/scripts/screen_vcp.py --output-dir reports/
 
 # Custom universe
-python3 skills/vcp-screener/scripts/screen_vcp.py --universe AAPL NVDA MSFT AMZN META --output-dir skills/vcp-screener/scripts
+python3 skills/vcp-screener/scripts/screen_vcp.py --universe AAPL NVDA MSFT AMZN META --output-dir reports/
 
 # Full S&P 500 (paid API tier)
-python3 skills/vcp-screener/scripts/screen_vcp.py --full-sp500 --output-dir skills/vcp-screener/scripts
+python3 skills/vcp-screener/scripts/screen_vcp.py --full-sp500 --output-dir reports/
 ```
 
 ### Strict Mode (Minervini pure setup)
