@@ -17,6 +17,24 @@ This skill retrieves upcoming earnings announcements for US stocks using the Fin
 - Flexible API key management
 - Organized by date, timing, and market cap
 
+## When to Use
+
+Invoke this skill when the user:
+- Requests an earnings calendar or asks which companies report earnings in the coming week
+- Wants a weekly earnings review focused on market-moving (mid-cap and above) names
+- Asks what earnings are due on a specific upcoming day
+- Wants to filter upcoming earnings by market cap or sector (e.g., mega-cap only, technology only)
+
+Do **not** use this skill for past/historical earnings results or intraday earnings reactions — those belong to the earnings-trade-analyzer and PEAD screener skills.
+
+## Output
+
+The skill produces two artifacts saved to the working directory (or `reports/`):
+- **`earnings_data.json`** — raw, filtered earnings records (>$2B market cap) sorted by date → timing → market cap, produced by `scripts/fetch_earnings_fmp.py`.
+- **`earnings_calendar_[YYYY-MM-DD].md`** — formatted markdown report produced by `scripts/generate_report.py`, grouped by date and timing (BMO/AMC/TAS) with EPS/revenue estimates, an executive summary, sector distribution, and trading considerations.
+
+The filename date reflects the report generation date, not the earnings week. See **Step 6** for the full report structure.
+
 ## Prerequisites
 
 ### FMP API Key
