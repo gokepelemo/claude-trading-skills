@@ -306,6 +306,20 @@ If user requested specific filters, note at top:
 - To save **raw JSON/text data**: use `--output reports/economic_calendar_[START]_to_[END].json` when running the script.
 - To save the **Markdown report**: ask the assistant to write it to `reports/` after generating it in chat.
 
+## Output
+
+The script emits **raw JSON or text** to stdout (or to `--output` when a path is given). It never writes a Markdown report — the assistant generates that from the raw data (see Step 6).
+
+**What is produced:**
+- **Script output (automatic):** JSON array (default) or plain text of economic events for the requested date range, printed to stdout or written to the `--output` file.
+- **Assistant report (on demand):** A chronological Markdown report with impact assessment and market implications, displayed in chat.
+
+**Saving results:**
+- Raw data: run the script with `--output reports/economic_calendar_[START]_to_[END].json`.
+- Markdown report: ask the assistant to write it to `reports/economic_calendar_[START]_to_[END].md` after it is generated in chat.
+
+No files are created automatically; nothing is written unless `--output` is passed or the assistant is asked to save the report. See the report structure and examples in Step 6 and the format requirements below.
+
 ## Assistant-Generated Report Format
 
 **Markdown structure requirements:**
