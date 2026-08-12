@@ -14,6 +14,13 @@ Coordinate all edge research stages into a single automated pipeline run.
 - Review and revise existing strategy drafts with feedback loop
 - Dry-run the pipeline to preview results without exporting
 
+## Prerequisites
+
+- Python 3.10+ with PyYAML
+- The edge pipeline subskills present under `skills/` (invoked via subprocess): `edge-candidate-agent`, `edge-hint-extractor`, `edge-concept-synthesizer`, `edge-strategy-designer`, `edge-strategy-reviewer`
+- Input artifacts for the chosen entry point: a `--tickets-dir` of ticket YAMLs, a `--from-ohlcv` CSV, or a `--drafts-dir` for resume/review-only modes
+- No API key required
+
 ## Workflow
 
 1. Load pipeline configuration from CLI arguments
