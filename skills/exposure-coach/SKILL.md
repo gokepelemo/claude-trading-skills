@@ -20,7 +20,10 @@ Exposure Coach synthesizes outputs from market-breadth-analyzer, uptrend-analyze
 ## Prerequisites
 
 - Python 3.9+
-- FMP API key (set `FMP_API_KEY` environment variable) for institutional-flow-tracker data
+- FMP API key (set `FMP_API_KEY` environment variable) for institutional-flow-tracker data:
+  ```bash
+  export FMP_API_KEY=your_key_here
+  ```
 - Input JSON files from upstream skills (see Workflow Step 1)
 - Standard library + `argparse`, `json`, `datetime`
 
