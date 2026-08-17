@@ -18,6 +18,19 @@ Translate natural-language stock screening requests into FinViz screener filter 
 
 ---
 
+## Prerequisites
+
+- Python 3 (standard library only — no extra packages to install)
+- Chrome installed for automatic browser opening (falls back to the OS-default browser or `--url-only` if not found)
+- No API key required for the public FinViz screener
+- Optional — FINVIZ Elite for enhanced functionality (real-time data, more filters), auto-detected from `$FINVIZ_API_KEY`:
+
+```bash
+export FINVIZ_API_KEY=your_key_here
+```
+
+---
+
 ## When to Use This Skill
 
 **Explicit Triggers:**
@@ -309,6 +322,17 @@ Screening works best as a dialogue, not a one-shot query:
 3. **Switch views** — start with `overview` for a quick scan, then switch to `financial` or `valuation` for deeper inspection
 4. **Layer in technicals** — after confirming fundamental quality, add `ta_` filters to time entries
 5. **Save and iterate** — bookmark the URL, then adjust one filter at a time to understand its impact
+
+---
+
+## Output
+
+This skill does not write files to `reports/` — it builds a FinViz URL and opens it in the browser. After running the script, report to the user:
+
+1. The constructed screener URL (also printed to stdout when `--url-only` is used)
+2. Elite or Public mode used
+3. Summary of applied filters/themes
+4. Suggested next steps (e.g., switch view, tighten/relax filters)
 
 ---
 
