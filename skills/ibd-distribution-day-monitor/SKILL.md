@@ -19,6 +19,14 @@ Do NOT use this skill to:
 - Execute trades or modify orders.
 - Generate discretionary market predictions outside of the IBD ruleset.
 
+## Prerequisites
+- Python 3.9+
+- FMP API key (`FMP_API_KEY` environment variable, `--api-key`, or `config.data.api_key`)
+
+```bash
+export FMP_API_KEY=your_key_here
+```
+
 ## Inputs
 - Symbols (default: QQQ, SPY) and lookback (default 80 trading sessions).
 - Optional `--as-of YYYY-MM-DD` for backtesting against a historical session.
@@ -97,6 +105,12 @@ python3 skills/ibd-distribution-day-monitor/scripts/ibd_monitor.py \
 
 ## API Requirements
 FMP API key required. Free tier (250 calls/day) is sufficient for daily QQQ + SPY runs.
+
+## Resources
+- `references/ibd_distribution_methodology.md`: Distribution Day detection, expiration, and counting rules.
+- `references/tqqq_exposure_policy.md`: TQQQ/QQQ exposure policy rationale.
+- `config/default.yaml`: Default thresholds and risk classification parameters.
+- `scripts/ibd_monitor.py`: CLI entry point.
 
 ## Related Skills
 - `ftd-detector`: Bottom confirmation via Follow-Through Days (counterpart of this top-side signal).
