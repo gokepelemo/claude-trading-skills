@@ -28,6 +28,22 @@ Three phases:
   every 1–5 min via `watch` or cron; replay-deterministic so re-runs
   are byte-identical.
 
+## Prerequisites
+
+- **FMP API key (required, Phase 1)** — set before running the screener:
+  ```bash
+  export FMP_API_KEY=your_key_here
+  ```
+  Or pass `--api-key YOUR_KEY` to `screen_parabolic.py`.
+- **Alpaca keys (optional, Phase 2 + Phase 3)** — enable live short-inventory
+  checks in Phase 2 and are required for live 5-min bars in Phase 3:
+  ```bash
+  export ALPACA_API_KEY=your_alpaca_key_id
+  export ALPACA_SECRET_KEY=your_alpaca_secret_key
+  ```
+  Without these, Phase 2 falls back to `ManualBrokerAdapter`
+  (`watch_only` plans) and Phase 3 requires `--bars-source fixture`.
+
 ## When to Use
 
 Invoke this skill when the user wants to:
