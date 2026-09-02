@@ -40,7 +40,26 @@ This skill requires Alpaca MCP Server to be configured and connected. The MCP se
 - `get_portfolio_history` - Historical portfolio performance data
 - Market data tools for price quotes and fundamentals
 
-If Alpaca MCP Server is not connected, inform the user and provide setup instructions from `references/alpaca_mcp_setup.md`.
+If Alpaca MCP Server is not connected, inform the user and provide setup instructions from `references/alpaca-mcp-setup.md`.
+
+### Verify the Alpaca Connection
+
+Before running a full analysis, confirm that credentials are valid with the bundled check script (paths are relative to this skill directory):
+
+```bash
+# Set credentials (paper account recommended for first run)
+export ALPACA_API_KEY="your_api_key_id"
+export ALPACA_SECRET_KEY="your_secret_key"
+export ALPACA_PAPER="true"   # "false" for live trading
+
+# Test account, positions, and (optional) market data endpoints
+python3 scripts/check_alpaca_connection.py
+
+# Run the skill's unit tests (no network or credentials required)
+python3 -m pytest scripts/tests/ -v
+```
+
+The check script exits 0 when the account and positions endpoints respond, and 1 with a diagnostic message when credentials are missing, rejected (HTTP 401/403), or the network is unreachable.
 
 ## Workflow
 
@@ -740,6 +759,29 @@ Model portfolio behavior under different scenarios:
 - "Should I sell [SYMBOL]?"
 - "Is [SYMBOL] overweight in my portfolio?"
 - "What should I do with [SYMBOL]?"
+
+## Resources
+
+All paths are relative to the skill directory (`skills/portfolio-manager/` in the repository).
+
+**Scripts:**
+- `scripts/check_alpaca_connection.py`: Verifies `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` and tests the account, positions, and market data endpoints. Run before the first analysis or when MCP tools return errors.
+- `scripts/tests/test_check_alpaca_connection.py`: Unit tests for the connection check (mocked HTTP; no credentials needed).
+
+**References:**
+- `references/alpaca-mcp-setup.md`: Alpaca MCP Server installation, API key configuration, troubleshooting
+- `references/asset-allocation.md`: Allocation frameworks by risk profile and sector guidelines
+- `references/diversification-principles.md`: Concentration thresholds, HHI, correlation concepts
+- `references/portfolio-risk-metrics.md`: Beta, drawdown, Sharpe, VaR
+- `references/position-evaluation.md`: HOLD / ADD / TRIM / SELL decision framework
+- `references/rebalancing-strategies.md`: Calendar, threshold, and tactical rebalancing; tax considerations
+- `references/target-allocations.md`: Model portfolios (conservative → aggressive)
+- `references/risk-profile-questionnaire.md`: Risk tolerance assessment
+
+**Related skills:**
+- `position-sizer`: Size new positions suggested in rebalancing recommendations
+- `trader-memory-core`: Record entries/exits executed from this skill's action items
+- `us-stock-analysis`: Deep-dive on individual holdings flagged in Step 4
 
 ## Limitations and Disclaimers
 
