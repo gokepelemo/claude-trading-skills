@@ -100,7 +100,7 @@ For each scenario:
 - Identify which sectors would likely outperform
 - Identify which sectors would likely underperform
 - Specify the catalysts or conditions that would confirm this scenario
-- Assign a probability (see Probability Assessment Framework in sector_rotation.md)
+- Assign a probability (see Probability Assessment Framework in `references/sector_rotation.md`)
 
 Scenarios should range from most likely (highest probability) to alternative/contrarian scenarios.
 
