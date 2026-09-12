@@ -49,11 +49,7 @@ When the user provides one or more weekly chart images for analysis:
 
 ### Step 2: Load Technical Analysis Framework
 
-Before beginning analysis, read the comprehensive technical analysis methodology:
-
-```
-Read: references/technical_analysis_framework.md
-```
+Before beginning analysis, read the comprehensive technical analysis methodology in `references/technical_analysis_framework.md`.
 
 This reference contains detailed guidance on:
 - Trend analysis and classification
@@ -131,11 +127,7 @@ Adjust probabilities based on strength of supporting technical factors. Ensure p
 
 ### Step 5: Generate Analysis Report
 
-For each chart analyzed, create a comprehensive markdown report using the template structure:
-
-```
-Read and use as template: assets/analysis_template.md
-```
+For each chart analyzed, create a comprehensive markdown report using the template structure in `assets/analysis_template.md`.
 
 The report must include all sections:
 1. Chart Overview
