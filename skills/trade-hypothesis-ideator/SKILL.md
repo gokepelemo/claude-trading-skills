@@ -11,6 +11,17 @@ description: >
 
 Generate 1-5 structured hypothesis cards from a normalized input bundle, critique and rank them, then optionally export `pursue` cards into `strategy.yaml` + `metadata.json` artifacts.
 
+## When to Use
+
+- When you have a structured input bundle (market data, trade logs, journal snippets) and want falsifiable trade strategy hypotheses
+- Before committing research time to a strategy idea — to get ranked hypothesis cards with kill criteria first
+- When feeding candidate strategies into the edge-finder pipeline (`edge-finder-candidate/v1` export)
+
+## Prerequisites
+
+- Normalized input bundle JSON matching `schemas/input_bundle.schema.json` (see `examples/example_input.json`)
+- Python 3.10+
+
 ## Workflow
 
 1. Receive input JSON bundle.
@@ -42,7 +53,13 @@ python3 skills/trade-hypothesis-ideator/scripts/run_hypothesis_ideator.py \
   --export-strategies
 ```
 
-## References
+## Output
+
+- Pass 1: `evidence_summary.json` — normalized evidence and prompt-ready text
+- Pass 2: `output_bundle.json` and `hypothesis_report.md` — ranked, guardrail-validated hypothesis cards
+- With `--export-strategies`: `strategies/<candidate_id>/` (`strategy.yaml` + `metadata.json`) and `strategy_exports.json` manifest for `pursue` hypotheses
+
+## Resources
 
 - `references/hypothesis_types.md`
 - `references/evidence_quality_guide.md`
