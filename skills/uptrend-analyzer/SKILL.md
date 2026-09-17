@@ -125,6 +125,12 @@ Confidence levels: High, Medium, Low.
 
 ---
 
+## Prerequisites
+
+- **API Key:** None required (uses free GitHub CSV data).
+- **Python 3.8+:** With `requests` library installed.
+- **Network access:** Required to download the CSV from Monty's GitHub repository at execution time.
+
 ## API Requirements
 
 **Required:** None (uses free GitHub CSV data)
