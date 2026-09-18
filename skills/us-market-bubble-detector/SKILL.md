@@ -17,6 +17,11 @@ description: Evaluates market bubble risk through quantitative data-driven analy
 
 ---
 
+## Prerequisites
+
+- No API keys required — data is gathered via web search/fetch (Put/Call, VIX, margin debt, breadth, IPO stats) and user-reported observations
+- Python 3.9+ with standard library only (for the optional `scripts/bubble_scorer.py` helper)
+
 ## When to Use This Skill
 
 Use this skill when:
@@ -470,6 +475,21 @@ Only consider shorts after confirming at least 3 of the following:
 ```
 
 ---
+
+## Helper Script
+
+`scripts/bubble_scorer.py` provides an optional 8-indicator scoring calculator (0-16 point scale, distinct from the mandatory Phase 1-4 process above) for quick manual scoring:
+
+```bash
+# Interactive mode: prompts for each indicator (0-2)
+python3 scripts/bubble_scorer.py --manual
+
+# Non-interactive mode: pass indicator scores as JSON
+python3 scripts/bubble_scorer.py --scores '{"mass_penetration":2,"media_saturation":1,"new_accounts":1,"new_issuance":0,"leverage":2,"price_acceleration":1,"valuation_disconnect":1,"breadth_expansion":0}'
+
+# JSON output for downstream processing
+python3 scripts/bubble_scorer.py --scores '{"mass_penetration":1,"media_saturation":1,"new_accounts":0,"new_issuance":0,"leverage":1,"price_acceleration":0,"valuation_disconnect":0,"breadth_expansion":0}' --output json
+```
 
 ## Reference Documents
 
