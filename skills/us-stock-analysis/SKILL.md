@@ -9,6 +9,30 @@ description: Comprehensive US stock analysis including fundamental analysis (fin
 
 Perform comprehensive analysis of US stocks covering fundamental analysis (financials, business quality, valuation), technical analysis (indicators, trends, patterns), peer comparisons, and generate detailed investment reports. Fetch real-time market data via web search tools and apply structured analytical frameworks.
 
+## When to Use
+
+- User requests analysis of one or more US stock tickers (e.g., "analyze AAPL", "compare TSLA vs NVDA")
+- User asks for fundamental evaluation, valuation assessment, or business quality review
+- User asks for technical analysis, trend, support/resistance, or indicator readings
+- User wants an investment report or Buy/Hold/Sell recommendation for American stocks
+
+Do not use for non-US equities, chart-screenshot analysis (use Technical Analyst), or screening many tickers at once (use the screener skills).
+
+## Prerequisites
+
+- Web search/fetch tools available for current market data (no API key required)
+- No scripts to run; analysis relies on the files in `references/`
+- Ticker symbol(s) supplied by the user or resolvable from the company name
+- Reports are saved to the `reports/` directory when a written report is requested
+
+## Workflow
+
+1. Identify the ticker(s) and the analysis type needed (see Analysis Types)
+2. Gather current data using web search (see Data Sources)
+3. Load the relevant `references/` files for the chosen analysis type
+4. Follow the matching procedure under Analysis Workflows (or Stock Comparison Analysis)
+5. Format the result per Output Guidelines and `references/report-template.md`, include data sources and dates, and save reports to `reports/`
+
 ## Data Sources
 
 Always use web search tools to gather current market data:
