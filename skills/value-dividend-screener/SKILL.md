@@ -16,6 +16,12 @@ Screen US equities based on quantitative criteria including valuation ratios, di
 
 **Efficiency Advantage**: Using FINVIZ pre-screening can reduce FMP API calls by 90%, making this approach ideal for free-tier API users.
 
+## Prerequisites
+
+- Python 3 with the `requests` library (`pip install requests`)
+- `FMP_API_KEY` environment variable (required; free tier allows 250 calls/day)
+- `FINVIZ_API_KEY` environment variable (optional; FINVIZ Elite needed for `--use-finviz` two-stage screening)
+
 ## When to Use
 
 Invoke this skill when the user requests:
@@ -305,6 +311,11 @@ Anticipate common user questions:
 - Diversification guidance: minimum 10-15 for dividend portfolio
 - Sector balance considerations
 - Position sizing based on risk tolerance
+
+## Output
+
+- `dividend_screener_results.json` (default: `logs/` under the project root; override with `--output`) containing `metadata` and a ranked `stocks` list
+- Markdown report generated from the JSON (Step 4), saved to `reports/` as `value_dividend_screener_<date>.md`
 
 ## Resources
 
