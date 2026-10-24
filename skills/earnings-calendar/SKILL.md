@@ -17,6 +17,17 @@ This skill retrieves upcoming earnings announcements for US stocks using the Fin
 - Flexible API key management
 - Organized by date, timing, and market cap
 
+## When to Use
+
+- User asks which companies report earnings in the upcoming week
+- User wants earnings dates, timing (BMO/AMC), or EPS/revenue estimates for mid-cap and larger US stocks
+- Planning weekly trades or reviewing event risk around earnings season
+
+## Output
+
+- Markdown report `earnings_calendar_[YYYY-MM-DD].md` grouped by date and timing (BMO/AMC/TAS), with executive summary, key observations, and data notes
+- Brief chat summary of key findings (company counts, peak day, top names by market cap)
+
 ## Prerequisites
 
 ### FMP API Key
