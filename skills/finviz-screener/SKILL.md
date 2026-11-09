@@ -42,6 +42,20 @@ Translate natural-language stock screening requests into FinViz screener filter 
 
 ---
 
+## Prerequisites
+
+- Python 3 (standard library only; no extra packages)
+- Chrome or another browser for opening the screener (use `--url-only` to skip opening)
+- API key: none for the public screener. Optional FINVIZ Elite key, auto-detected from the environment:
+
+```bash
+export FINVIZ_API_KEY=your_key_here
+```
+
+This skill does not use an FMP key, so `FMP_API_KEY` is not needed.
+
+---
+
 ## Workflow
 
 ### Step 1: Load Filter Reference
@@ -171,6 +185,14 @@ After opening the screener, report:
 2. Elite or Public mode used
 3. Summary of applied filters
 4. Suggested next steps (e.g., "Sort by dividend yield", "Switch to Financial view for detailed ratios")
+
+---
+
+## Output
+
+- The constructed FinViz screener URL, printed to stdout (and opened in the browser unless `--url-only` is set)
+- A summary in the conversation: mode (Elite or Public), applied filters/themes/sub-themes, view, and suggested next steps
+- No report files are written; save any notes to `reports/` only if the user requests them
 
 ---
 
